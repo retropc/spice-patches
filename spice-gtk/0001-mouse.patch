@@ -1,0 +1,74 @@
+--- spice-gtk-0.35.orig/src/channel-inputs.c
++++ spice-gtk-0.35/src/channel-inputs.c
+@@ -17,6 +17,7 @@
+ */
+ #include "config.h"
+ 
++#include "hacks.h"
+ #include "spice-client.h"
+ #include "spice-common.h"
+ #include "spice-channel-priv.h"
+@@ -427,6 +428,12 @@ void spice_inputs_channel_button_press(S
+     case SPICE_MOUSE_BUTTON_RIGHT:
+         button_state |= SPICE_MOUSE_BUTTON_MASK_RIGHT;
+         break;
++    case SPICE_MOUSE_BUTTON_SIDE:
++        button_state |= SPICE_MOUSE_BUTTON_MASK_SIDE;
++        break;
++    case SPICE_MOUSE_BUTTON_EXTRA:
++        button_state |= SPICE_MOUSE_BUTTON_MASK_EXTRA;
++        break;
+     }
+ 
+     c->bs  = button_state;
+@@ -492,6 +499,12 @@ void spice_inputs_channel_button_release
+     case SPICE_MOUSE_BUTTON_RIGHT:
+         button_state &= ~SPICE_MOUSE_BUTTON_MASK_RIGHT;
+         break;
++    case SPICE_MOUSE_BUTTON_SIDE:
++        button_state &= ~SPICE_MOUSE_BUTTON_MASK_SIDE;
++        break;
++    case SPICE_MOUSE_BUTTON_EXTRA:
++        button_state &= ~SPICE_MOUSE_BUTTON_MASK_EXTRA;
++        break;
+     }
+ 
+     c->bs = button_state;
+--- /dev/null
++++ spice-gtk-0.35/src/hacks.h
+@@ -0,0 +1,5 @@
++#define SPICE_MOUSE_BUTTON_SIDE 6
++#define SPICE_MOUSE_BUTTON_EXTRA 7
++#define SPICE_MOUSE_BUTTON_MASK_SIDE (1 << 5)
++#define SPICE_MOUSE_BUTTON_MASK_EXTRA (1 << 6)
++
+--- spice-gtk-0.35.orig/src/spice-widget.c
++++ spice-gtk-0.35/src/spice-widget.c
+@@ -38,6 +38,7 @@
+ #endif
+ #endif
+ 
++#include "hacks.h"
+ #include "spice-widget.h"
+ #include "spice-widget-priv.h"
+ #include "spice-gtk-session-priv.h"
+@@ -1900,6 +1901,8 @@ static int button_gdk_to_spice(guint gdk
+         [ 3 ] = SPICE_MOUSE_BUTTON_RIGHT,
+         [ 4 ] = SPICE_MOUSE_BUTTON_UP,
+         [ 5 ] = SPICE_MOUSE_BUTTON_DOWN,
++        [ 8 ] = SPICE_MOUSE_BUTTON_SIDE,
++        [ 9 ] = SPICE_MOUSE_BUTTON_EXTRA,
+     };
+ 
+     if (gdk < SPICE_N_ELEMENTS(map)) {
+@@ -1918,6 +1921,10 @@ static int button_mask_gdk_to_spice(int
+         spice |= SPICE_MOUSE_BUTTON_MASK_MIDDLE;
+     if (gdk & GDK_BUTTON3_MASK)
+         spice |= SPICE_MOUSE_BUTTON_MASK_RIGHT;
++    if (gdk & (1 << 15))
++        spice |= SPICE_MOUSE_BUTTON_MASK_SIDE;
++    if (gdk & (1 << 16))
++        spice |= SPICE_MOUSE_BUTTON_MASK_EXTRA;
+     return spice;
+ }
+ 

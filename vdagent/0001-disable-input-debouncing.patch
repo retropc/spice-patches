@@ -1,0 +1,25 @@
+diff --git a/vdagent/vdagent.cpp b/vdagent/vdagent.cpp
+index e8bb974..9c1d6a5 100644
+--- a/vdagent/vdagent.cpp
++++ b/vdagent/vdagent.cpp
+@@ -623,7 +623,7 @@ bool VDAgent::send_input()
+     } else {
+         _last_mouse = _new_mouse;
+     }
+-    _input_time = GetTickCount();
++//    _input_time = GetTickCount();
+     _desktop_layout->unlock();
+     return ret;
+ }
+@@ -636,6 +636,8 @@ bool VDAgent::handle_mouse_event(const VDAgentMouseState* state)
+     }
+ 
+     if (_new_mouse.x != _last_mouse.x || _new_mouse.y != _last_mouse.y) {
++        return send_input();
++
+         if (GetTickCount() - _input_time > VD_INPUT_INTERVAL_MS) {
+             return send_input();
+         }
+-- 
+2.30.2
+

@@ -1,0 +1,22 @@
+--- virt-viewer-7.0.orig/src/virt-viewer-app.c
++++ virt-viewer-7.0/src/virt-viewer-app.c
+@@ -1288,6 +1288,8 @@ virt_viewer_app_server_cut_text(VirtView
+                                 const gchar *text,
+                                 VirtViewerApp *self)
+ {
++    return;
++
+     GtkClipboard *cb;
+     gsize a, b;
+     VirtViewerAppPrivate *priv = self->priv;
+--- virt-viewer-7.0.orig/src/virt-viewer-session-spice.c
++++ virt-viewer-7.0/src/virt-viewer-session-spice.c
+@@ -392,7 +392,7 @@ create_spice_session(VirtViewerSessionSp
+     spice_set_session_option(self->priv->session);
+ 
+     self->priv->gtk_session = spice_gtk_session_get(self->priv->session);
+-    g_object_set(self->priv->gtk_session, "auto-clipboard", TRUE, NULL);
++    g_object_set(self->priv->gtk_session, "auto-clipboard", FALSE, NULL);
+ 
+     virt_viewer_signal_connect_object(self->priv->session, "channel-new",
+                                       G_CALLBACK(virt_viewer_session_spice_channel_new), self, 0);

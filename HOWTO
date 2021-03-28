@@ -1,0 +1,34 @@
+export BASE=$(readlink -f .)
+export SUFFIX="retropc"
+
+libspice-server1
+  patches:
+    - mouse buttons 
+  instructions:  
+    - apt source libspice-server1 && cd spice-0*/ && cp $BASE/spice-server/* debian/patches/ && (cd $BASE/spice-server/ && ls -1) | sort >> debian/patches/series && dch -l "+$SUFFIX" && dpkg-buildpackage -us -uc
+    - rm -f ../libspice-server1_*{dbg,dev}*+${SUFFIX}1_amd64.deb; sudo dpkg -i ../libspice-server1_*+${SUFFIX}1_amd64.deb
+
+spice-gtk
+  patches:
+    - mouse buttons 
+  instructions:
+    - apt source libspice-client-gtk-3.0-5 && cd spice-gtk-0*/ && cp $BASE/spice-gtk/* debian/patches/ && (cd $BASE/spice-gtk/ && ls -1) | sort >> debian/patches/series && dch -l "+$SUFFIX" && dpkg-buildpackage -us -uc
+    - rm -f ../libspice-client-gtk-3.0-*{dbg,dev}*+${SUFFIX}1_amd64.deb; sudo dpkg -i ../libspice-client-gtk-3.0-*+${SUFFIX}1_amd64.deb
+
+vd-agent:
+  needs:
+    - HEAD: c84f9942d7d57463c4790c8e0aad67c096c71415
+    - built on fedora 33
+  patches:
+    - disabling of GetTickCount() measurement in mouse controls for latency
+    - button4/5 support
+  instructions:
+    - see .gitlab-ci.yml
+
+virt-viewer:
+  patches:
+    - autoclipboard disabled (v9 has this as an option that can be set)
+  instructions:
+    - apt source virt-viewer && cd virt-viewer-*/ && cp $BASE/virt-viewer/* debian/patches/ && (cd $BASE/virt-viewer/ && ls -1) | sort >> debian/patches/series && dch -l "+$SUFFIX" && dpkg-buildpackage -us -uc
+    - run out of directory (safety)
+
