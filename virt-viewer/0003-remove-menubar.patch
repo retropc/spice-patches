@@ -1,0 +1,11 @@
+--- virt-viewer-7.0.orig/src/virt-viewer-window.c
++++ virt-viewer-7.0/src/virt-viewer-window.c
+@@ -483,7 +483,7 @@ virt_viewer_window_leave_fullscreen(Virt
+         virt_viewer_display_set_fullscreen(priv->display, FALSE);
+     }
+     virt_viewer_timed_revealer_force_reveal(priv->revealer, FALSE);
+-    gtk_widget_show(menu);
++//    gtk_widget_show(menu);
+     gtk_widget_hide(priv->toolbar);
+     gtk_widget_set_size_request(priv->window, -1, -1);
+     gtk_window_unfullscreen(GTK_WINDOW(priv->window));

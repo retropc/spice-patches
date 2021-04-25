@@ -6,14 +6,23 @@ libspice-server1
     - mouse buttons 
   instructions:  
     - apt source libspice-server1 && cd spice-0*/ && cp $BASE/spice-server/* debian/patches/ && (cd $BASE/spice-server/ && ls -1) | sort >> debian/patches/series && dch -l "+$SUFFIX" && dpkg-buildpackage -us -uc
-    - rm -f ../libspice-server1_*{dbg,dev}*+${SUFFIX}1_amd64.deb; sudo dpkg -i ../libspice-server1_*+${SUFFIX}1_amd64.deb
+    - rm -f ../libspice-server*{dev,dbg}*+${SUFFIX}1_amd64.deb; sudo dpkg -i ../libspice-server1_*+${SUFFIX}1_amd64.deb
 
 spice-gtk
   patches:
     - mouse buttons 
   instructions:
     - apt source libspice-client-gtk-3.0-5 && cd spice-gtk-0*/ && cp $BASE/spice-gtk/* debian/patches/ && (cd $BASE/spice-gtk/ && ls -1) | sort >> debian/patches/series && dch -l "+$SUFFIX" && dpkg-buildpackage -us -uc
-    - rm -f ../libspice-client-gtk-3.0-*{dbg,dev}*+${SUFFIX}1_amd64.deb; sudo dpkg -i ../libspice-client-gtk-3.0-*+${SUFFIX}1_amd64.deb
+    - rm -f ../libspice-client-gtk-3.0-*dbg*+${SUFFIX}1_amd64.deb ../libspice-client-glib-*dbg*+${SUFFIX}1_amd64.deb; sudo dpkg -i ../libspice-client-gtk-3.0-*+${SUFFIX}1_amd64.deb ../libspice-client-glib-*+${SUFFIX}1_amd64.deb ../gir1.2-spiceclientgtk-*+${SUFFIX}1_amd64.deb ../gir1.2-spiceclientglib-*+${SUFFIX}1_amd64.deb
+
+virt-viewer:
+  patches:
+    - autoclipboard disabled (v9 has this as an option that can be set)
+    - disable annoying bar at top in fullscreen mode
+    - disable menu bap that keeps messing with guest resolution
+  instructions:
+    - apt source virt-viewer && cd virt-viewer-*/ && cp $BASE/virt-viewer/* debian/patches/ && (cd $BASE/virt-viewer/ && ls -1) | sort >> debian/patches/series && dch -l "+$SUFFIX" && dpkg-buildpackage -us -uc
+    - run out of directory (safety)
 
 vd-agent:
   needs:
@@ -24,11 +33,3 @@ vd-agent:
     - button4/5 support
   instructions:
     - see .gitlab-ci.yml
-
-virt-viewer:
-  patches:
-    - autoclipboard disabled (v9 has this as an option that can be set)
-  instructions:
-    - apt source virt-viewer && cd virt-viewer-*/ && cp $BASE/virt-viewer/* debian/patches/ && (cd $BASE/virt-viewer/ && ls -1) | sort >> debian/patches/series && dch -l "+$SUFFIX" && dpkg-buildpackage -us -uc
-    - run out of directory (safety)
-
