@@ -1,21 +1,21 @@
 --- /dev/null
-+++ spice-0.14.0/server/hacks.h
++++ spice-0.14.3/server/hacks.h
 @@ -0,0 +1,4 @@
 +#define VD_AGENT_SBUTTON_MASK (1 << 6)
 +#define VD_AGENT_EBUTTON_MASK (1 << 7)
 +#define SPICE_MOUSE_BUTTON_MASK_SIDE (1 << 5)
 +#define SPICE_MOUSE_BUTTON_MASK_EXTRA (1 << 6)
---- spice-0.14.0.orig/server/inputs-channel.c
-+++ spice-0.14.0/server/inputs-channel.c
-@@ -28,6 +28,7 @@
- #include <common/messages.h>
+--- spice-0.14.3.orig/server/inputs-channel.c
++++ spice-0.14.3/server/inputs-channel.c
+@@ -27,6 +27,7 @@
  #include <common/generated_server_marshallers.h>
+ #include <common/demarshallers.h>
  
 +#include "hacks.h"
- #include "demarshallers.h"
  #include "spice.h"
  #include "red-common.h"
-@@ -153,7 +154,9 @@ const VDAgentMouseState *inputs_channel_
+ #include "reds.h"
+@@ -158,7 +159,9 @@ const VDAgentMouseState *inputs_channel_
  #define RED_MOUSE_BUTTON_STATE_TO_AGENT(state)                      \
      (((state & SPICE_MOUSE_BUTTON_MASK_LEFT) ? VD_AGENT_LBUTTON_MASK : 0) |    \
       ((state & SPICE_MOUSE_BUTTON_MASK_MIDDLE) ? VD_AGENT_MBUTTON_MASK : 0) |    \
@@ -24,11 +24,11 @@
 +     ((state & SPICE_MOUSE_BUTTON_MASK_SIDE) ? VD_AGENT_SBUTTON_MASK : 0) |    \
 +     ((state & SPICE_MOUSE_BUTTON_MASK_EXTRA) ? VD_AGENT_EBUTTON_MASK : 0))
  
- static void activate_modifiers_watch(InputsChannel *inputs, RedsState *reds)
+ static void activate_modifiers_watch(InputsChannel *inputs)
  {
---- spice-0.14.0.orig/server/reds.c
-+++ spice-0.14.0/server/reds.c
-@@ -49,6 +49,7 @@
+--- spice-0.14.3.orig/server/reds.c
++++ spice-0.14.3/server/reds.c
+@@ -53,6 +53,7 @@
  #include <common/generated_server_marshallers.h>
  #include <common/ring.h>
  
@@ -36,7 +36,7 @@
  #include "spice.h"
  #include "reds.h"
  #include "agent-msg-filter.h"
-@@ -1851,7 +1852,9 @@ static void reds_handle_main_link(RedsSt
+@@ -1936,7 +1937,9 @@ static void reds_handle_main_link(RedsSt
  #define RED_MOUSE_BUTTON_STATE_TO_AGENT(state)                      \
      (((state & SPICE_MOUSE_BUTTON_MASK_LEFT) ? VD_AGENT_LBUTTON_MASK : 0) |    \
       ((state & SPICE_MOUSE_BUTTON_MASK_MIDDLE) ? VD_AGENT_MBUTTON_MASK : 0) |    \

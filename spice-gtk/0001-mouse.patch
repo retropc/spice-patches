@@ -1,14 +1,6 @@
---- spice-gtk-0.35.orig/src/channel-inputs.c
-+++ spice-gtk-0.35/src/channel-inputs.c
-@@ -17,6 +17,7 @@
- */
- #include "config.h"
- 
-+#include "hacks.h"
- #include "spice-client.h"
- #include "spice-common.h"
- #include "spice-channel-priv.h"
-@@ -427,6 +428,12 @@ void spice_inputs_channel_button_press(S
+--- spice-gtk-0.39.orig/src/channel-inputs.c
++++ spice-gtk-0.39/src/channel-inputs.c
+@@ -426,6 +426,12 @@ void spice_inputs_channel_button_press(S
      case SPICE_MOUSE_BUTTON_RIGHT:
          button_state |= SPICE_MOUSE_BUTTON_MASK_RIGHT;
          break;
@@ -21,7 +13,7 @@
      }
  
      c->bs  = button_state;
-@@ -492,6 +499,12 @@ void spice_inputs_channel_button_release
+@@ -491,6 +497,12 @@ void spice_inputs_channel_button_release
      case SPICE_MOUSE_BUTTON_RIGHT:
          button_state &= ~SPICE_MOUSE_BUTTON_MASK_RIGHT;
          break;
@@ -34,25 +26,9 @@
      }
  
      c->bs = button_state;
---- /dev/null
-+++ spice-gtk-0.35/src/hacks.h
-@@ -0,0 +1,5 @@
-+#define SPICE_MOUSE_BUTTON_SIDE 6
-+#define SPICE_MOUSE_BUTTON_EXTRA 7
-+#define SPICE_MOUSE_BUTTON_MASK_SIDE (1 << 5)
-+#define SPICE_MOUSE_BUTTON_MASK_EXTRA (1 << 6)
-+
---- spice-gtk-0.35.orig/src/spice-widget.c
-+++ spice-gtk-0.35/src/spice-widget.c
-@@ -38,6 +38,7 @@
- #endif
- #endif
- 
-+#include "hacks.h"
- #include "spice-widget.h"
- #include "spice-widget-priv.h"
- #include "spice-gtk-session-priv.h"
-@@ -1900,6 +1901,8 @@ static int button_gdk_to_spice(guint gdk
+--- spice-gtk-0.39.orig/src/spice-widget.c
++++ spice-gtk-0.39/src/spice-widget.c
+@@ -2034,6 +2034,8 @@ static int button_gdk_to_spice(guint gdk
          [ 3 ] = SPICE_MOUSE_BUTTON_RIGHT,
          [ 4 ] = SPICE_MOUSE_BUTTON_UP,
          [ 5 ] = SPICE_MOUSE_BUTTON_DOWN,
@@ -61,7 +37,16 @@
      };
  
      if (gdk < SPICE_N_ELEMENTS(map)) {
-@@ -1918,6 +1921,10 @@ static int button_mask_gdk_to_spice(int
+@@ -2048,6 +2050,8 @@ static int button_gdk_to_spice_mask(guin
+         [1] = SPICE_MOUSE_BUTTON_MASK_LEFT,
+         [2] = SPICE_MOUSE_BUTTON_MASK_MIDDLE,
+         [3] = SPICE_MOUSE_BUTTON_MASK_RIGHT,
++        [8] = SPICE_MOUSE_BUTTON_MASK_SIDE,
++        [9] = SPICE_MOUSE_BUTTON_MASK_EXTRA,
+     };
+ 
+     if (gdk < SPICE_N_ELEMENTS(map)) {
+@@ -2066,6 +2070,10 @@ static int button_mask_gdk_to_spice(int
          spice |= SPICE_MOUSE_BUTTON_MASK_MIDDLE;
      if (gdk & GDK_BUTTON3_MASK)
          spice |= SPICE_MOUSE_BUTTON_MASK_RIGHT;
@@ -72,3 +57,12 @@
      return spice;
  }
  
+@@ -2607,7 +2615,7 @@ static void spice_display_class_init(Spi
+ /* ---------------------------------------------------------------- */
+ 
+ #define SPICE_GDK_BUTTONS_MASK \
+-    (GDK_BUTTON1_MASK|GDK_BUTTON2_MASK|GDK_BUTTON3_MASK|GDK_BUTTON4_MASK|GDK_BUTTON5_MASK)
++    (GDK_BUTTON1_MASK|GDK_BUTTON2_MASK|GDK_BUTTON3_MASK|GDK_BUTTON4_MASK|GDK_BUTTON5_MASK|(1 << 15)|(1 << 16))
+ 
+ static GdkDevice *spice_gdk_window_get_pointing_device(GdkWindow *window)
+ {

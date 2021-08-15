@@ -1,19 +1,38 @@
 export BASE=$(readlink -f .)
-export SUFFIX="retropc"
+export SUFFIX="retropc1."
+
+first:
+  apt build-dep libspice-server1 spice-gtk virt-viewer
 
 libspice-server1
   patches:
-    - mouse buttons 
-  instructions:  
-    - apt source libspice-server1 && cd spice-0*/ && cp $BASE/spice-server/* debian/patches/ && (cd $BASE/spice-server/ && ls -1) | sort >> debian/patches/series && dch -l "+$SUFFIX" && dpkg-buildpackage -us -uc
-    - rm -f ../libspice-server*{dev,dbg}*+${SUFFIX}1_amd64.deb; sudo dpkg -i ../libspice-server1_*+${SUFFIX}1_amd64.deb
+    - mouse buttons (currently incompatible with master due to qemu patch not being in debian stable)
+  instructions:
+    mkdir libspice-server1 && cd libspice-server1
+    apt source libspice-server1 && cd */
+    mkdir -p debian/patches && cp $BASE/spice-server/* debian/patches/ && (cd $BASE/spice-server/ && ls -1) | sort >> debian/patches/series
+    dch -l "+$SUFFIX"
+    dpkg-buildpackage -us -uc
+    cd ..
+    rm -f *-{dbgsym,dev}_*.deb
+    sudo dpkg -i *.deb
+    cd ..
 
 spice-gtk
   patches:
     - mouse buttons 
   instructions:
-    - apt source libspice-client-gtk-3.0-5 && cd spice-gtk-0*/ && cp $BASE/spice-gtk/* debian/patches/ && (cd $BASE/spice-gtk/ && ls -1) | sort >> debian/patches/series && dch -l "+$SUFFIX" && dpkg-buildpackage -us -uc
-    - rm -f ../libspice-client-gtk-3.0-*dbg*+${SUFFIX}1_amd64.deb ../libspice-client-glib-*dbg*+${SUFFIX}1_amd64.deb; sudo dpkg -i ../libspice-client-gtk-3.0-*+${SUFFIX}1_amd64.deb ../libspice-client-glib-*+${SUFFIX}1_amd64.deb ../gir1.2-spiceclientgtk-*+${SUFFIX}1_amd64.deb ../gir1.2-spiceclientglib-*+${SUFFIX}1_amd64.deb
+    mkdir spice-gtk && cd spice-gtk
+    apt source libspice-client-gtk-3.0-5 && cd */
+    mkdir -p debian/patches && cp $BASE/spice-gtk/* debian/patches/ && (cd $BASE/spice-gtk/ && ls -1) | sort >> debian/patches/series
+    dch -l "+$SUFFIX"
+    dpkg-buildpackage -us -uc
+    cd ..
+    rm -f *-dbgsym_*.deb
+    sudo dpkg -i *.deb
+    cd ..
+  other notes:
+    (dev packages needed to compile virt-viewer)
 
 virt-viewer:
   patches:
@@ -21,8 +40,18 @@ virt-viewer:
     - disable annoying bar at top in fullscreen mode
     - disable menu bap that keeps messing with guest resolution
   instructions:
-    - apt source virt-viewer && cd virt-viewer-*/ && cp $BASE/virt-viewer/* debian/patches/ && (cd $BASE/virt-viewer/ && ls -1) | sort >> debian/patches/series && dch -l "+$SUFFIX" && dpkg-buildpackage -us -uc
-    - run out of directory (safety)
+    mkdir virt-viewer && cd virt-viewer
+    apt source virt-viewer && cd */
+    mkdir -p debian/patches && cp $BASE/virt-viewer/* debian/patches/ && (cd $BASE/virt-viewer/ && ls -1) | sort >> debian/patches/series
+    dch -l "+$SUFFIX"
+    dpkg-buildpackage -us -uc
+    cd ../..
+  notes:
+    run out of directory (safety)
+    these packages are optional and can be removed:
+      apt remove --purge spice-client-gtk
+    these packages were only needed for build and can be removed:
+      apt remove --purge gir1.2-spiceclientglib-2.0 gir1.2-spiceclientgtk-3.0 libspice-client-glib-2.0-dev libspice-client-gtk-3.0-dev
 
 vd-agent:
   needs:
@@ -33,3 +62,6 @@ vd-agent:
     - button4/5 support
   instructions:
     - see .gitlab-ci.yml
+
+
+remember to apt-mark hold everything installed!
